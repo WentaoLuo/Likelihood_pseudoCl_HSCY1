@@ -9,12 +9,30 @@
 #PBS -N run_mn
 
 export VAR=value
-dir_montepython=${HOME}/work/downloads/montepython_public-2.2.2/
+### set the directory of Monte Python code
+dir_montepython=
+#dir_montepython=${HOME}/work/downloads/montepython_public-2.2.2/
+
+### set the directory of HSC pseudoCl likelihood
 likelihoodname=HSC_Y1_pseudoCl_likelihood
 dir_likelihood=${dir_montepython}montepython/likelihoods/${likelihoodname}/
+if [ ! -d ${dir_likelihood} ]; then
+mkdir $dir_likelihood
+fi
+
+### working directory
 workdir=${dir_montepython}test_code/
-HSCdatadir=${workdir}data
+if [ ! -d ${workdir} ]; then
+mkdir $workdir
+fi
 cd ${workdir}
+
+HSCdatadir=${workdir}data
+if [ ! -d ${HSCdatadir} ]; then
+mkdir $HSCdatadir
+fi
+
+cp -f __init__.py ${dir_likelihood} 
 
 ### number of cores
 npro=1

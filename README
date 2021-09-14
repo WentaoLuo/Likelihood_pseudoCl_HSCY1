@@ -1,0 +1,13 @@
+This is the likelihood codes of HSC Y1 cosmic shear power spectrum and relevant data,
+which used in C. Hikage, PASJ 71 (2019) 43 (arXiv:1809.09148)
+
+The likelihood is available in the Monte Python (The Monte Carlo code for CLASS in Python)
+and download it from the following:
+ https://baudren.github.io/montepython.html
+
+Set the direcotry name of Monte Python in "run.sh"
+
+The likelihood code can be run as
+sh run.sh
+
+
