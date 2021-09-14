@@ -1,0 +1,45 @@
+#-----CLASS v2.6.3 (branch: , hash: )-----
+
+data.experiments=['HSC_Y1_pseudoCl_likelihood']
+data.cosmo_arguments['omega_b'] = 0.02254
+data.cosmo_arguments['omega_cdm'] = 0.11417
+data.cosmo_arguments['n_s'] = 0.97
+data.cosmo_arguments['h'] = 0.6982
+data.cosmo_arguments['ln10^{10}A_s'] = 3.07
+data.parameters['A_IA'] = [0., -5., 5., 0.1, 1, 'nuisance']
+data.parameters['exp_IA'] = [0., -5., 5., 0.1, 1, 'nuisance']
+data.parameters['m_corr'] = [0.5, 0, 1, 0.1, 1, 'nuisance']
+data.parameters['a_psf'] = [0.5, 0, 1, 0.1, 1, 'nuisance']
+data.parameters['b_psf'] = [0.5, 0, 1, 0.1, 1, 'nuisance']
+data.parameters['zshift_1'] = [0.5, 0, 1, 0.1, 1, 'nuisance']
+data.parameters['zshift_2'] = [0.5, 0, 1, 0.1, 1, 'nuisance']
+data.parameters['zshift_3'] = [0.5, 0, 1, 0.1, 1, 'nuisance']
+data.parameters['zshift_4'] = [0.5, 0, 1, 0.1, 1, 'nuisance']
+data.parameters['Omega_m']      = [1, None, None, 0, 1, 'derived']
+data.parameters['sigma8']       = [1, None, None, 0, 1, 'derived']
+data.cosmo_arguments['output'] = 'mPk'
+data.cosmo_arguments['P_k_max_h/Mpc'] = 100.
+data.cosmo_arguments['Omega_k'] = 0.
+data.cosmo_arguments['sBBN file'] = data.path['cosmo']+'/bbn/sBBN.dat'
+data.cosmo_arguments['k_pivot'] = 0.05
+data.write_step=1
+
+
+#-----Likelihood-HSC_Y1_pseudoCl_likelihood-----
+HSC_Y1_pseudoCl_likelihood.use_nuisance = ['m_corr', 'a_psf', 'b_psf', 'zshift_1', 'zshift_2', 'zshift_3', 'zshift_4', 'A_IA', 'exp_IA']
+HSC_Y1_pseudoCl_likelihood.zbin_max = [0.6, 0.9, 1.2, 1.5]
+HSC_Y1_pseudoCl_likelihood.use_bin = [1, 1, 1, 1]
+HSC_Y1_pseudoCl_likelihood.dtype = 'blind0'
+HSC_Y1_pseudoCl_likelihood.cov_output = False
+HSC_Y1_pseudoCl_likelihood.cov_recalculate = True
+HSC_Y1_pseudoCl_likelihood.k_max = 100.0
+HSC_Y1_pseudoCl_likelihood.nellsmax = 39
+HSC_Y1_pseudoCl_likelihood.specmode = 'EE'
+HSC_Y1_pseudoCl_likelihood.mode = 'halofit'
+HSC_Y1_pseudoCl_likelihood.data_directory = '/home/chiaki.hikage/work/downloads/montepython_public-2.2.2/test_code/data'
+HSC_Y1_pseudoCl_likelihood.correction_mbias = True
+HSC_Y1_pseudoCl_likelihood.zbin_min = [0.3, 0.6, 0.9, 1.2]
+HSC_Y1_pseudoCl_likelihood.nzmax = 299
+HSC_Y1_pseudoCl_likelihood.photoz_zcut = 'ephor_ab'
+HSC_Y1_pseudoCl_likelihood.bands_to_use = [0, 1, 1, 1, 1, 1, 1, 0, 0]
+HSC_Y1_pseudoCl_likelihood.photoz_method = 'ephor_ab_rewei_ab'
