@@ -5,9 +5,15 @@ The likelihood is available in the Monte Python (The Monte Carlo code for CLASS 
 and download it from the following:
  https://baudren.github.io/montepython.html
 
-Set the direcotry name of Monte Python in "run.sh"
+1. Add the HSC pseudo-Cl likelihood "HSC_Y1_pseudoCl_likelihood" into montepython/likelihoods/
 
-The likelihood code can be run as
-sh run.sh
+2. Set the montepython directryname (dir_montepython) in the file of prepare.sh 
+   You can also change various parameters such as samplers and the parameters
+
+3. Run the shell script prepare.sh, which makes the input files to run the code
+
+4. Run the likelihood code as
+   sh jobscript.sh (or qsub jobscript.sh to submit the job in clusters)
+
 
 

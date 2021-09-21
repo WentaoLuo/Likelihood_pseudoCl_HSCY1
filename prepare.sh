@@ -1,115 +1,100 @@
-#!/bin/bash
-#PBS -q tiny
-#PBS -l nodes=1:ppn=1
-#PBS -l walltime=240:00:00
-#PBS -l mem=60GB
-#PBS -m n
-#PBS -e mpiout/
-#PBS -o mpiout/
-#PBS -N run_mn
+#!/bin/sh
 
-export VAR=value
-### set the directory of Monte Python code
-dir_montepython=
+####!!! set the directry name of montepython !!!####
 #dir_montepython=${HOME}/work/downloads/montepython_public-2.2.2/
+dir_montepython=
 
-### set the directory of HSC pseudoCl likelihood
 likelihoodname=HSC_Y1_pseudoCl_likelihood
 dir_likelihood=${dir_montepython}montepython/likelihoods/${likelihoodname}/
-if [ ! -d ${dir_likelihood} ]; then
-mkdir $dir_likelihood
-fi
+workdir=`pwd`
+HSCdatadir=${workdir}/data
+cd $workdir
 
-### working directory
-workdir=${dir_montepython}test_code/
-if [ ! -d ${workdir} ]; then
-mkdir $workdir
-fi
-cd ${workdir}
-
-HSCdatadir=${workdir}data
-if [ ! -d ${HSCdatadir} ]; then
-mkdir $HSCdatadir
-fi
-
-cp -f __init__.py ${dir_likelihood} 
-
-### number of cores
+### You can change various parameters ###
+#1. set the number of cores in the likelihood calculation
 npro=1
 
-### choose sampler [multinest, MH]
+#2. choose sampler [multinest, MH]
 #sampler=multinest
 sampler=MH
 
-### multinest parameters
+#2a. set multinest parameters
 # sampleing efficiency
 efr=0.8 
 #efr=0.3
 
-#evidence_tolerance
+#2b. evidence_tolerance
 tol=0.5
 #tol=0.1
 
-#max iteration number
+#2c.max iteration number
 niter=1000000
 
-#number of live points
+#2d. number of live points
 nlive=2000
 
-#importance nested sampling
+#2e. importance nested sampling
 ISflag=True
 
-### the following file is used when running MH sampler
+#2f. the following file is used when running MH sampler
 covfile=fiducial_HSC.covmat
 
-### cosmology [free,wmap9,planck15]
-#cosmo=free
+#3. LCDM cosmological parameters (standard 5 parameters except for tau) are varied within some priors or fixed  [vary,wmap9,planck15]
+#cosmo=vary
 cosmo=wmap9
 
-
-#kind: mock,obs
-kind=obs
-
-#which spectrum is used: EE, BB, EB
-specmode=EE
-
-#cmodel: LCDM,wCDM
+#3a. choose cosmological model: LCDM,wCDM
+#w parameter is varied when cmodel=wCDM
 cmodel=LCDM
 
-#matter power spectrum: [dmonly, baryon, owls_agn, owls_dm]
+#3b. how to treat neutrino mass [0,min,vary]
+massnu=0
+
+#4. dtype: mock,obs
+dtype=obs
+
+#5. which spectrum is used in likelihood calculation: EE, BB, EB
+# EE is compared with the theoretical cosmic shear spectra
+# BB/EB are used in the null test
+specmode=EE
+
+#6. which matter power spectrum code is used: [dmonly, baryon, owls_agn, owls_dm]
 matterspec=dmonly
 
-#nuisance parameteers: [fid,noIA,etafix,noshapeerr,nophotozerr,IAonly]
+#7. choose which set of nuisance parameters are adopted: [fid,noIA,etafix,noshapeerr,nophotozerr,IAonly]
 nuisance=fid
 
-#select the method how to derive the photo-z distribution and separate into tomographic bins
+###select the method how to derive the photo-z distribution and separate into tomographic bins
+## currently just the following set is applicable
+if [ $dtype = "obs" ]; then
 pz_method=ephor_ab_rewei_ab
 nzmax=299
 zcut_method=ephor_ab
-if [ $kind = "mock" ]; then
+elif [ $dtype = "mock" ]; then
 pz_method=mlz
 zcut_method=mlz
 nzmax=599
+else
+echo "choose what photo-z methods are used"
+exit
 fi
 
-#neutrino mass [0,min,vary]
-massnu=no
-
-#covariance is fixed or varied: [vary,fix]
+#8. covariance is fixed or varied: [vary,fix]
 covfix=vary
 
-#output covariance in some fixed cosmlogy? [y or n]
-# if yes, cosmo set to be wmap9/planck15. Output of the covariance is "cov_fixed.dat", which will be used as the fixed covariance in the following run.
-cov_output='n'
+#9. output covariance in some fixed cosmlogy? [y or n]
+# if yes, the covariance is output with the name of "cov_fixed.dat", and rerun the code by setting "covfix=fix" and "cov_output=n"
+cov_output=n
 
-#number of tomographic bins [4]
+### number of tomographic bins [4]
+# currently just 4 bins are available
 nzbin=4
 
-### write data file for the class ${likelihoodname}
+### output data file for the class ${likelihoodname}
 infdata=${dir_likelihood}/${likelihoodname}.data
 
 echo "HSC_Y1_pseudoCl_likelihood.data_directory = '"${HSCdatadir}"'" > $infdata
-echo "HSC_Y1_pseudoCl_likelihood.dtype = '"${kind}"'" >> $infdata
+echo "HSC_Y1_pseudoCl_likelihood.dtype = '"${dtype}"'" >> $infdata
 echo "HSC_Y1_pseudoCl_likelihood.specmode = '"${specmode}"'" >> $infdata
 echo "HSC_Y1_pseudoCl_likelihood.photoz_zcut = '"${zcut_method}"'" >> $infdata
 echo "HSC_Y1_pseudoCl_likelihood.photoz_method = '"${pz_method}"'" >> $infdata
@@ -131,7 +116,7 @@ case "$covfix" in
     "vary" ) echo "HSC_Y1_pseudoCl_likelihood.cov_recalculate = True" >> $infdata ;;
     "fix" ) echo "HSC_Y1_pseudoCl_likelihood.cov_recalculate = False" >> $infdata ;;
 esac
-case "$kind" in 
+case "$dtype" in 
     "mock" ) echo "HSC_Y1_pseudoCl_likelihood.correction_mbias = False" >> $infdata ;;
     "obs" ) echo "HSC_Y1_pseudoCl_likelihood.correction_mbias = True" >> $infdata ;;
 esac
@@ -155,10 +140,10 @@ esac
 
 cat $infdata
 
-### write input parameter file for MCMC samplers
+### output input parameter file for MCMC samplers
 paramfile=input.param
 echo "data.experiments=['HSC_Y1_pseudoCl_likelihood']" > $paramfile
-if [ $cosmo = "free" ]; then
+if [ $cosmo = "vary" ]; then
 ### default prior
 echo "data.parameters['omega_b']      = [0.022,  0.019, 0.026, 0.002,  1, 'cosmo']" >> $paramfile
 echo "data.parameters['omega_cdm']    = [0.12,   0.03, 0.7, 0.01,    1, 'cosmo']" >> $paramfile
@@ -177,6 +162,9 @@ echo "data.cosmo_arguments['omega_cdm'] = 0.11979" >> $paramfile
 echo "data.cosmo_arguments['n_s'] = 0.96507" >> $paramfile
 echo "data.cosmo_arguments['h'] = 0.6779" >> $paramfile
 echo "data.cosmo_arguments['ln10^{10}A_s'] = 3.0891" >> $paramfile
+else
+echo "set cosmological parameters"
+exit
 fi
 
 if [ $massnu = "vary" ]; then
@@ -242,32 +230,43 @@ if [ ! -d 'chains' ]; then
 mkdir chains
 fi
 
-dir_chains=chains/HSC_Y1_${kind}
-
-echo $dir_chains
-echo $nlive $niter
 echo $paramfile
 
-rm -rf ${dir_chains}
-mkdir ${dir_chains}
+outdir=chains/HSC_Y1_${dtype}
+
+numdir=0
+outdir_try=$outdir
+while [ -d $outdir_try ];
+do
+echo ${outdir_try}" already exists"
+numdir=`expr $numdir + 1`
+outdir_try=${outdir}_${numdir}
+done
+
+outdir=$outdir_try
+echo "make directory " $outdir
+mkdir $outdir
+
+### output job script file for running the code
+
+jobfile="jobscript.sh"
+
+echo "#!/bin/bash" > $jobfile
+echo "#PBS -q tiny" >> $jobfile
+echo "#PBS -l nodes=1:ppn=1" >> $jobfile
+echo "#PBS -l walltime=240:00:00" >> $jobfile
+echo "#PBS -l mem=60GB" >> $jobfile
+echo "#PBS -m n" >> $jobfile
+echo "#PBS -e mpiout/" >> $jobfile
+echo "#PBS -o mpiout/" >> $jobfile
+echo "#PBS -N run_mn" >> $jobfile
+echo  >> $jobfile
+echo "export VAR=value" >> $jobfile
+echo "cd "${workdir} >> $jobfile
 
 if [ $sampler = 'multinest' ]; then
-mpirun -np ${npro} python ${dir_montepython}montepython/MontePython.py run \
-    -p ${paramfile} \
-    -o ${dir_chains}/ \
-    -m NS \
-    --NS_importance_nested_sampling ${ISflag} \
-    --NS_evidence_tolerance ${tol} \
-    --NS_sampling_efficiency ${efr} \
-    --NS_n_live_points ${nlive} \
-    --NS_max_iter ${niter}
+echo mpirun -np ${npro} python ${dir_montepython}montepython/MontePython.py run -p ${paramfile} -o ${outdir}/ -m NS --NS_importance_nested_sampling ${ISflag} --NS_evidence_tolerance ${tol} --NS_sampling_efficiency ${efr} --NS_n_live_points ${nlive} --NS_max_iter ${niter} >> $jobfile
 else
-python ${dir_montepython}montepython/MontePython.py run \
-    -o ${dir_chains} \
-    -p ${paramfile} \
-    -N 1000000 \
-    -c ${covfile} \
-    -f 1.5 -j fast
-    --update 300
+echo python ${dir_montepython}montepython/MontePython.py run -o ${outdir} -p ${paramfile} -N 1000000 -c ${covfile} -f 1.5 -j fast --update 300 >> $jobfile
 fi
 
