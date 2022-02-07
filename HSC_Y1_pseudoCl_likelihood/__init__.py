@@ -638,6 +638,7 @@ class HSC_Y1_pseudoCl_likelihood(Likelihood):
         cosmo_for_colossus=cosmology.setCosmology('myCosmo',params_for_colossus)
 
         ### for the integral over halo mass
+        #logmmin = 8.0
         logmmin = 10.0
         logmmax = 16.0
         #dlogm = 0.1
@@ -650,8 +651,8 @@ class HSC_Y1_pseudoCl_likelihood(Likelihood):
         ### for the integral over redshift 
         zmin=0.01
         zmax=1.5
-        dlnz=0.2
         #dlnz=0.1
+        dlnz=0.2
         zs = np.exp(np.arange(np.log(zmin),np.log(zmax),dlnz) + dlnz * 0.5)
 
         nzmax = len(zs)
