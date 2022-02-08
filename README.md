@@ -18,11 +18,11 @@ and download it from the following:
 
 
 This code work with Python 2.7.5 and the library used in this code is
- Numpy, Scipy
- Monte Python 2.2.2/3.0.1 (B. Audren)
- MultiNest: v3.10/v3.11 (Feroz, Hobson), if you want to run nestcheck, v3.11 is required
- CLASS 2.6.3
- CLASS with HMcode (Brieden, Archidiacono, Lesgourgues)
+ Numpy, Scipy, 
+ Monte Python 2.2.2/3.0.1 (B. Audren), 
+ MultiNest: v3.10/v3.11 (Feroz, Hobson) (if you want to run nestcheck, v3.11 is required),
+ CLASS 2.6.3,
+ CLASS with HMcode (Brieden, Archidiacono, Lesgourgues),
  Colossus 1.2.1 (Diemer 2018)
 
 
