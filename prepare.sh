@@ -50,7 +50,7 @@ cmodel=LCDM
 #3b. how to treat neutrino mass [0,min,vary]
 massnu=0
 
-#4. dtype: mock,obs
+#4. dtype: obs
 dtype=obs
 
 #5. which spectrum is used in likelihood calculation: EE, BB, EB
@@ -70,10 +70,6 @@ if [ $dtype = "obs" ]; then
 pz_method=ephor_ab_rewei_ab
 nzmax=299
 zcut_method=ephor_ab
-elif [ $dtype = "mock" ]; then
-pz_method=mlz
-zcut_method=mlz
-nzmax=599
 else
 echo "choose what photo-z methods are used"
 exit
@@ -117,7 +113,6 @@ case "$covfix" in
     "fix" ) echo "HSC_Y1_pseudoCl_likelihood.cov_recalculate = False" >> $infdata ;;
 esac
 case "$dtype" in 
-    "mock" ) echo "HSC_Y1_pseudoCl_likelihood.correction_mbias = False" >> $infdata ;;
     "obs" ) echo "HSC_Y1_pseudoCl_likelihood.correction_mbias = True" >> $infdata ;;
 esac
 if [ $cov_output = 'y' ]; then
